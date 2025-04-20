@@ -15,7 +15,7 @@ RUN pnpm install
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 3001
+EXPOSE 3002
 
 # Run the app in development mode
 CMD ["pnpm", "dev"] 

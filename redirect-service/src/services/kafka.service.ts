@@ -1,6 +1,7 @@
 import { Consumer } from 'kafkajs';
-import { consumer } from '../config/kafka';
+import { consumer, producer } from '../config/kafka';
 import { setCachedURL } from '../config/redis';
+import { Request } from 'express';
 
 interface URLCreatedEvent {
   type: 'url.created';
@@ -11,9 +12,21 @@ interface URLCreatedEvent {
   timestamp: string;
 }
 
+interface URLClickEvent {
+  type: 'url.clicked';
+  data: {
+    shortUrl: string;
+    timestamp: string;
+    userAgent?: string;
+    ipAddress?: string;
+    referer?: string;
+  };
+}
+
 export class KafkaService {
   private static readonly TOPICS = {
-    URL_EVENTS: 'url.events'
+    URL_EVENTS: 'url.events',
+    URL_CLICKS: 'url.clicks'
   };
 
   private static async handleURLCreated(event: URLCreatedEvent) {
@@ -26,9 +39,40 @@ export class KafkaService {
     }
   }
 
-  static async startConsumer() {
+  static async emitClickEvent(shortUrl: string, req: Request) {
     try {
-      await consumer.connect();
+      const event: URLClickEvent = {
+        type: 'url.clicked',
+        data: {
+          shortUrl,
+          timestamp: new Date().toISOString(),
+          userAgent: req.headers['user-agent']?.toString(),
+          ipAddress: req.ip,
+          referer: req.headers['referer']?.toString()
+        }
+      };
+
+      await producer.send({
+        topic: this.TOPICS.URL_CLICKS,
+        messages: [{
+          value: JSON.stringify(event)
+        }]
+      });
+
+      console.log(`Emitted click event for: ${shortUrl}`);
+    } catch (error) {
+      console.error('Error emitting click event:', error);
+    }
+  }
+
+  static async startServices() {
+    try {
+      // Connect both consumer and producer
+      await Promise.all([
+        consumer.connect(),
+        producer.connect()
+      ]);
+
       await consumer.subscribe({
         topic: this.TOPICS.URL_EVENTS,
         fromBeginning: true
@@ -50,19 +94,22 @@ export class KafkaService {
         }
       });
 
-      console.log('Kafka consumer started');
+      console.log('Kafka services started');
     } catch (error) {
-      console.error('Error starting Kafka consumer:', error);
+      console.error('Error starting Kafka services:', error);
       throw error;
     }
   }
 
-  static async stopConsumer() {
+  static async stopServices() {
     try {
-      await consumer.disconnect();
-      console.log('Kafka consumer stopped');
+      await Promise.all([
+        consumer.disconnect(),
+        producer.disconnect()
+      ]);
+      console.log('Kafka services stopped');
     } catch (error) {
-      console.error('Error stopping Kafka consumer:', error);
+      console.error('Error stopping Kafka services:', error);
     }
   }
 } 

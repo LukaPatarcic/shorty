@@ -17,8 +17,8 @@ app.get('/:code', RedirectController.redirect);
 // Initialize Kafka consumer and start server
 async function initialize() {
   try {
-    // Start Kafka consumer
-    await KafkaService.startConsumer();
+    // Start Kafka services
+    await KafkaService.startServices();
     
     // Start the server
     app.listen(port, () => {
@@ -33,13 +33,13 @@ async function initialize() {
 // Handle graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM signal received. Shutting down...');
-  await KafkaService.stopConsumer();
+  await KafkaService.stopServices();
   process.exit(0);
 });
 
 process.on('SIGINT', async () => {
   console.log('SIGINT signal received. Shutting down...');
-  await KafkaService.stopConsumer();
+  await KafkaService.stopServices();
   process.exit(0);
 });
 

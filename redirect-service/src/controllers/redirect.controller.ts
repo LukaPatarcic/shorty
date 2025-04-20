@@ -1,5 +1,6 @@
 import { Request, Response, RequestHandler, NextFunction } from 'express';
 import { getCachedURL } from '../config/redis';
+import { KafkaService } from '../services/kafka.service';
 
 export class RedirectController {
   static redirect: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
@@ -17,6 +18,9 @@ export class RedirectController {
         res.status(404).json({ error: 'URL not found' });
         return;
       }
+
+      // Emit click event before redirecting
+      await KafkaService.emitClickEvent(code, req);
 
       // Send a 301 permanent redirect
       res.redirect(301, originalUrl);
