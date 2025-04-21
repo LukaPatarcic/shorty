@@ -1,5 +1,0 @@
-{"level":"info","message":"Elasticsearch indices created"}
-{"level":"info","message":"Kafka initialized successfully"}
-{"level":"info","message":"Analytics service listening on port 3002"}
-{"data":{"code":"6w0GvB-W","created_at":"2025-04-21T14:10:19.923Z","id":16,"normalized_url":"https://www.youtube.com","original_url":"https://www.youtube.com/","updated_at":"2025-04-21T14:10:19.923Z"},"level":"info","message":"Processed click event for: 6w0GvB-W"}
-{"data":{"code":"6w0GvB-W","ipAddress":"::ffff:192.168.65.1","originalUrl":"https://www.youtube.com/","referer":"dakisa.com","timestamp":"2025-04-21T14:13:11.299Z","userAgent":"PostmanRuntime/7.43.3"},"level":"info","message":"Processed click event for: 6w0GvB-W"}
