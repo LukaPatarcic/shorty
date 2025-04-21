@@ -12,10 +12,10 @@ const app = express();
 const port = env.PORT || 3001;
 
 // Health check endpoint
-app.get('/health', RedirectController.health);
+app.get('/redirect/health', RedirectController.health);
 
 // Redirect endpoint
-app.get('/:code', RedirectController.redirect);
+app.get('/redirect/:code', RedirectController.redirect);
 
 // Initialize Kafka consumer and start server
 async function initialize() {

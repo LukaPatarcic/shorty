@@ -61,7 +61,7 @@ async function setupKafkaConsumer() {
 
 // API endpoints
 app.get('/analytics/:code', AnalyticsController.getAnalytics);
-app.get('/health', AnalyticsController.health);
+app.get('/analytics/health', AnalyticsController.health);
 
 // Start the server
 async function initialize() {

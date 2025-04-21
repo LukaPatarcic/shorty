@@ -50,14 +50,18 @@ The project consists of three main microservices:
    git clone <repository-url>
    cd shorty
    ```
+2. Add domain to /etc/hosts:
+   ```bash
+   127.0.0.1 shorty.com
+   ```
 
-2. Install dependencies:
+3. Install dependencies:
 
    ```bash
    pnpm install
    ```
 
-3. Set up environment variables:
+4. Set up environment variables:
    Create `.env` files in each service directory by copying .env.template:
 
    - `root/.env`
@@ -65,11 +69,12 @@ The project consists of three main microservices:
    - `redirect-service/.env`
    - `analytics-service/.env`
 
-4. Start the services:
+5. Start the services:
 
    ```bash
    docker-compose up -d
    ```
+6. Access all endpoints on http://shorty.com
 
 ## 🔌 Service Endpoints
 

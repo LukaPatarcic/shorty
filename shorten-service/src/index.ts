@@ -13,7 +13,7 @@ const port = env.PORT || 3000;
 
 app.use(express.json());
 
-app.get('/health', UrlController.health);
+app.get('/shorten/health', UrlController.health);
 app.post('/shorten', UrlController.shorten);
 
 // Initialize connections
