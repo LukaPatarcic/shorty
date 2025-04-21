@@ -13,6 +13,9 @@ importers:
       '@elastic/elasticsearch':
         specifier: ^8.12.1
         version: 8.18.0
+      '@shorty/shared':
+        specifier: file:../shared/dist
+        version: dist@file:shared/dist
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
@@ -38,6 +41,9 @@ importers:
 
   redirect-service:
     dependencies:
+      '@shorty/shared':
+        specifier: file:../shared/dist
+        version: dist@file:shared/dist
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0

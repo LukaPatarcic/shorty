@@ -1,5 +1,6 @@
 import { Kafka, Partitioners } from 'kafkajs';
 import dotenv from 'dotenv';
+import { TOPICS } from '@shorty/shared';
 
 dotenv.config();
 
@@ -21,12 +22,6 @@ const producer = kafka.producer({
 
 const consumer = kafka.consumer({ groupId: 'shorty-service-group' });
 const admin = kafka.admin();
-
-// Topic configuration
-export const TOPICS = {
-  URL_EVENTS: 'url.events',
-  URL_CLICKS: 'url.clicks'
-} as const;
 
 // Initialize Kafka topics
 export async function initializeKafka() {

@@ -1,5 +1,6 @@
 import { Kafka, Partitioners } from 'kafkajs';
 import dotenv from 'dotenv';
+import { TOPICS } from '@shorty/shared';
 
 dotenv.config();
 
@@ -18,12 +19,6 @@ const kafka = new Kafka({
 const consumer = kafka.consumer({ groupId: 'analytics-service-group' });
 const admin = kafka.admin();
 
-// Topic configuration
-export const TOPICS = {
-  URL_EVENTS: 'url.events',
-  URL_CLICKS: 'url.clicks'
-} as const;
-
 // Initialize Kafka topics
 export async function initializeKafka() {
   try {
@@ -31,7 +26,7 @@ export async function initializeKafka() {
     
     // Subscribe to topics
     await consumer.connect();
-    await consumer.subscribe({ topics: [TOPICS.URL_CLICKS], fromBeginning: true });
+    await consumer.subscribe({ topics: [TOPICS.URL_EVENTS], fromBeginning: true });
 
     console.log('Kafka initialized successfully');
   } catch (error) {
@@ -41,5 +36,6 @@ export async function initializeKafka() {
     await admin.disconnect();
   }
 }
+
 
 export { kafka, consumer }; 

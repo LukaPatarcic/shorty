@@ -1,7 +1,8 @@
 import { CreateURL, URL, normalizeURL } from '../models/url';
 import { URLDao } from '../models/url.dao';
-import { producer, TOPICS } from '../config/kafka';
+import { producer } from '../config/kafka';
 import { nanoid } from 'nanoid';
+import { TOPICS } from '@shorty/shared';
 
 export class URLService {
   private static readonly CODE_LENGTH = 8;

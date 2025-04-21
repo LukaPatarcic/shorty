@@ -2,6 +2,7 @@ import { Consumer } from 'kafkajs';
 import { consumer, producer } from '../config/kafka';
 import { setCachedURL } from '../config/redis';
 import { Request } from 'express';
+import { TOPICS } from '@shorty/shared';
 
 interface URLCreatedEvent {
   type: 'url.created';
@@ -24,10 +25,6 @@ interface URLClickEvent {
 }
 
 export class KafkaService {
-  private static readonly TOPICS = {
-    URL_EVENTS: 'url.events',
-    URL_CLICKS: 'url.clicks'
-  };
 
   private static async handleURLCreated(event: URLCreatedEvent) {
     try {
@@ -53,7 +50,7 @@ export class KafkaService {
       };
 
       await producer.send({
-        topic: this.TOPICS.URL_CLICKS,
+        topic: TOPICS.URL_EVENTS,
         messages: [{
           value: JSON.stringify(event)
         }]
@@ -74,7 +71,7 @@ export class KafkaService {
       ]);
 
       await consumer.subscribe({
-        topic: this.TOPICS.URL_EVENTS,
+        topic: TOPICS.URL_EVENTS,
         fromBeginning: true
       });
 
