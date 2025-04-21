@@ -4,6 +4,7 @@ import { RedirectController } from './controllers/redirect.controller';
 import { KafkaService } from './services/kafka.service';
 import { env } from './config/env';
 import logger from './config/logger';
+import './config/trace';
 
 dotenv.config();
 

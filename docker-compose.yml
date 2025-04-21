@@ -12,13 +12,16 @@ services:
       - ./shared:/app/shared
     env_file:
       - ./shorten-service/.env
-    # environment:
-    #   - NODE_ENV=development
-    #   - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/shorty
-    #   - KAFKA_BROKERS=kafka:9092
+    networks:
+      - default
+      - datadog-network
     depends_on:
-      - postgres
-      - kafka
+      postgres:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      datadog-agent:
+        condition: service_started
 
   redirect-service:
     build:
@@ -33,14 +36,16 @@ services:
       - ./shared:/app/shared
     env_file:
       - ./redirect-service/.env
-    # environment:
-    #   - NODE_ENV=development
-    #   - KAFKA_BROKERS=kafka:9092
-    #   - REDIS_URL=redis://redis:6379
+    networks:
+      - default
+      - datadog-network
     depends_on:
-      - postgres
-      - kafka
-      - redis
+      kafka:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      datadog-agent:
+        condition: service_started
 
   analytics-service:
     build:
@@ -55,13 +60,14 @@ services:
       - ./shared:/app/shared
     env_file:
       - ./analytics-service/.env
-    # environment:
-    #   - NODE_ENV=development
-    #   - KAFKA_BROKER=kafka:9092
-    #   - ELASTICSEARCH_URL=http://elasticsearch:9200
+    networks:
+      - default
+      - datadog-network
     depends_on:
-      - kafka
-      - elasticsearch
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
 
   redis:
     image: redis:7-alpine
@@ -93,6 +99,22 @@ services:
       - POSTGRES_DB=shorty
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - default
+      - datadog-network
+    labels:
+      com.datadoghq.ad.check_names: '["postgres"]'
+      com.datadoghq.ad.init_configs: "[{}]"
+      com.datadoghq.ad.instances: |
+        [
+          {
+            "host": "%%host%%",
+            "port": "5432",
+            "username": "postgres",
+            "password": "postgres",
+            "dbname": "shorty"
+          }
+        ]
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.3
@@ -101,26 +123,43 @@ services:
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
+      - ZOOKEEPER_INIT_LIMIT=5
+      - ZOOKEEPER_SYNC_LIMIT=2
     volumes:
       - zookeeper_data:/var/lib/zookeeper/data
       - zookeeper_log:/var/lib/zookeeper/log
+    healthcheck:
+      test: echo stat | nc localhost 2181 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   kafka:
     image: confluentinc/cp-kafka:7.5.3
     ports:
       - "9092:9092"
+      - "29092:29092"
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
-      - KAFKA_LOG_RETENTION_HOURS=168 # 7 days retention
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_LOG_RETENTION_HOURS=168
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
     volumes:
       - kafka_data:/var/lib/kafka/data
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test: nc -z localhost 9092 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -161,6 +200,46 @@ services:
       elasticsearch:
         condition: service_healthy
 
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:latest
+    pid: host
+    environment:
+      - DD_API_KEY=ae732953a5e151d34520c958152906cd
+      - DD_SITE=datadoghq.eu
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_CONTAINER_EXCLUDE_LOGS="name:datadog-agent"
+      - DD_PROCESS_AGENT_ENABLED=true
+      # PostgreSQL monitoring
+      - DD_POSTGRES_HOST=postgres
+      - DD_POSTGRES_PORT=5432
+      - DD_POSTGRES_USER=postgres
+      - DD_POSTGRES_PASS=postgres
+      - DD_POSTGRES_DBNAME=shorty
+      - DD_ENABLE_METADATA_COLLECTION=true
+      - DD_POSTGRES_CUSTOM_QUERIES=/conf.d/postgres.d/conf.yaml
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./datadog/postgres.d:/conf.d/postgres.d:ro
+    ports:
+      - "8126:8126"
+    networks:
+      - datadog-network
+      - default
+    healthcheck:
+      test: ["CMD", "agent", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_started
+
 volumes:
   postgres_data:
   redis_data:
@@ -168,3 +247,7 @@ volumes:
   kafka_data:
   zookeeper_data:
   zookeeper_log:
+
+networks:
+  datadog-network:
+    name: datadog-network

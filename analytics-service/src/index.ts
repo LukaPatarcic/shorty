@@ -4,10 +4,9 @@ import { consumer, initializeKafka } from './config/kafka';
 import { esClient, esIndices } from './config/elasticsearch';
 import { setupElasticsearch } from './config/elasticsearch';
 import { AnalyticsController } from './controllers/analytics.controller';
-import { time } from 'console';
 import logger from './config/logger';
 import { env } from './config/env';
-
+import './config/trace';
 dotenv.config();
 
 const app = express();

@@ -4,6 +4,7 @@ import { initializeKafka } from './config/kafka';
 import { UrlController } from './controllers/url.controller';
 import { env } from './config/env';
 import logger from './config/logger';
+import './config/trace';
 
 dotenv.config();
 

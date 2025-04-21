@@ -1,0 +1,20 @@
+init_config:
+
+instances:
+  - host: postgres
+    port: 5432
+    username: postgres
+    password: postgres
+    dbname: shorty
+    
+    # Enable built-in metrics
+    collect_function_metrics: true
+    collect_count_metrics: true
+    collect_activity_metrics: true
+    collect_database_size_metrics: true
+    collect_default_database: true
+
+    # Additional tags
+    tags:
+      - "env:development"
+      - "service:postgres" 
