@@ -3,7 +3,6 @@ import { env } from './env';
 
 const { combine, timestamp, printf, colorize, json } = winston.format;
 
-// Custom log format
 const logFormat = printf(({ level, message, timestamp, stack, ...rest }) => {
   if (stack) {
     return `${timestamp} [${level}] ${message}\n${stack}`;
@@ -14,14 +13,8 @@ const logFormat = printf(({ level, message, timestamp, stack, ...rest }) => {
   return `${timestamp} [${level}] ${message}`;
 });
 
-// Create the logger
 const logger = winston.createLogger({
   level: env.NODE_ENV === 'production' ? 'info' : 'debug',
-//   format: combine(
-//     errors({ stack: true }),
-//     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-//     logFormat
-//   ),
   format: json(),
   transports: [
     // Console transport
