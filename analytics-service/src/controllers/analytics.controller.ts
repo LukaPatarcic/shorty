@@ -1,47 +1,53 @@
 import { Request, Response, RequestHandler, NextFunction } from 'express';
-import { esClient } from '../config/elasticsearch';
+import { esClient, esIndices } from '../config/elasticsearch';
 
 interface ClickAnalyticsAggregations {
   total_clicks: { value: number };
   hourly_clicks: { buckets: Array<{ key: string; doc_count: number }> };
   user_agents: { buckets: Array<{ key: string; doc_count: number }> };
   top_referers: { buckets: Array<{ key: string; doc_count: number }> };
+  ip_addresses: { buckets: Array<{ key: string; doc_count: number }> };
 }
 
 export class AnalyticsController {
   static getAnalytics: RequestHandler = async (req: Request, res: Response) => {
-  const { shortUrl } = req.params;
+  const { code } = req.params;
   
   try {
     // Get URL metadata
     const urlMetadata = await esClient.search({
-      index: 'urls',
+      index: esIndices.urlMetadata,
       query: {
         term: {
-          shortUrl: shortUrl
+          code: code
         }
       }
     });
 
     // Get click analytics
     const clickAnalytics = await esClient.search({
-      index: 'url-clicks',
+      index: esIndices.urlClicks,
       query: {
         term: {
-          shortUrl: shortUrl
+          code: code
         }
       },
       size: 0,
       aggs: {
         total_clicks: {
           value_count: {
-            field: 'shortUrl'
+            field: 'code'
           }
         },
         hourly_clicks: {
           date_histogram: {
             field: 'timestamp',
             calendar_interval: 'hour'
+          }
+        },
+        ip_addresses: {
+          terms: {
+            field: 'ipAddress.keyword'
           }
         },
         user_agents: {
@@ -63,6 +69,7 @@ export class AnalyticsController {
         totalClicks: (clickAnalytics.aggregations as unknown as ClickAnalyticsAggregations).total_clicks.value || 0,
         hourlyDistribution: (clickAnalytics.aggregations as unknown as ClickAnalyticsAggregations).hourly_clicks.buckets || [],
         userAgents: (clickAnalytics.aggregations as unknown as ClickAnalyticsAggregations).user_agents.buckets || [],
+        ipAddresses: (clickAnalytics.aggregations as unknown as ClickAnalyticsAggregations).ip_addresses.buckets || [],
         topReferers: (clickAnalytics.aggregations as unknown as ClickAnalyticsAggregations).top_referers.buckets || []
       }
     });

@@ -16,7 +16,8 @@ interface URLCreatedEvent {
 interface URLClickEvent {
   type: 'url.clicked';
   data: {
-    shortUrl: string;
+    originalUrl: string;
+    code: string;
     timestamp: string;
     userAgent?: string;
     ipAddress?: string;
@@ -36,12 +37,13 @@ export class KafkaService {
     }
   }
 
-  static async emitClickEvent(shortUrl: string, req: Request) {
+  static async emitClickEvent(data: { originalUrl: string, code: string }, req: Request) {
     try {
       const event: URLClickEvent = {
         type: 'url.clicked',
         data: {
-          shortUrl,
+          originalUrl: data.originalUrl,
+          code: data.code,
           timestamp: new Date().toISOString(),
           userAgent: req.headers['user-agent']?.toString(),
           ipAddress: req.ip,
@@ -56,7 +58,7 @@ export class KafkaService {
         }]
       });
 
-      console.log(`Emitted click event for: ${shortUrl}`);
+      console.log(`Emitted click event for: ${data.originalUrl}`);
     } catch (error) {
       console.error('Error emitting click event:', error);
     }

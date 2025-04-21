@@ -20,7 +20,7 @@ export class RedirectController {
       }
 
       // Emit click event before redirecting
-      await KafkaService.emitClickEvent(code, req);
+      await KafkaService.emitClickEvent({ originalUrl, code }, req);
 
       // Send a 301 permanent redirect
       res.redirect(301, originalUrl);
