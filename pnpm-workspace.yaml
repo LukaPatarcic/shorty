@@ -1,0 +1,5 @@
+packages:
+  - 'shorten-service'
+  - 'redirect-service'
+  - 'analytics-service'
+  - 'shared' 

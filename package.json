@@ -1,0 +1,13 @@
+{
+  "name": "shorty",
+  "private": true,
+  "version": "1.0.0",
+  "description": "URL shortener monorepo",
+  "scripts": {
+    "dev": "pnpm -r dev",
+    "build": "pnpm -r build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

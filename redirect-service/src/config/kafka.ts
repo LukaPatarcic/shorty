@@ -8,7 +8,7 @@ process.env.KAFKAJS_NO_PARTITIONER_WARNING = '1';
 
 const kafka = new Kafka({
   clientId: 'shorty-service',
-  brokers: (process.env.KAFKA_BROKERS || 'kafka:9092').split(','),
+  brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
   retry: {
     initialRetryTime: 300,
     retries: 10
@@ -35,24 +35,14 @@ export async function initializeKafka() {
     
     // Create topics if they don't exist
     await admin.createTopics({
-      topics: [
-        {
-          topic: TOPICS.URL_EVENTS,
-          numPartitions: 1,
-          replicationFactor: 1,
-          configEntries: [
-            { name: 'retention.ms', value: '604800000' } // 7 days retention
-          ]
-        },
-        {
-          topic: TOPICS.URL_CLICKS,
-          numPartitions: 1,
-          replicationFactor: 1,
-          configEntries: [
-            { name: 'retention.ms', value: '604800000' } // 7 days retention
-          ]
-        }
-      ],
+      topics: [{
+        topic: TOPICS.URL_EVENTS,
+        numPartitions: 1,
+        replicationFactor: 1,
+        configEntries: [
+          { name: 'retention.ms', value: '604800000' } // 7 days retention
+        ]
+      }],
       waitForLeaders: true,
       timeout: 10000
     });

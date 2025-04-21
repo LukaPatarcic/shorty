@@ -1,13 +1,15 @@
 services:
   shorten-service:
     build:
-      context: ./shorten-service
+      context: .
       dockerfile: ./infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: shorten-service
     ports:
       - "3000:3000"
     volumes:
-      - ./shorten-service:/app
-      - /app/node_modules
+      - ./shorten-service:/app/shorten-service
+      - ./shared:/app/shared
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/shorty
@@ -18,13 +20,15 @@ services:
 
   redirect-service:
     build:
-      context: ./redirect-service
+      context: .
       dockerfile: ./infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: redirect-service
     ports:
       - "3001:3001"
     volumes:
-      - ./redirect-service:/app
-      - /app/node_modules
+      - ./redirect-service:/app/redirect-service
+      - ./shared:/app/shared
     environment:
       - NODE_ENV=development
       - KAFKA_BROKERS=kafka:9092
@@ -36,13 +40,15 @@ services:
 
   analytics-service:
     build:
-      context: ./analytics-service
+      context: .
       dockerfile: ./infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: analytics-service
     ports:
       - "3002:3002"
     volumes:
-      - ./analytics-service:/app
-      - /app/node_modules
+      - ./analytics-service:/app/analytics-service
+      - ./shared:/app/shared
     environment:
       - NODE_ENV=development
       - KAFKA_BROKER=kafka:9092
