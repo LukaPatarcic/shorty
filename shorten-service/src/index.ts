@@ -2,14 +2,12 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { initializeKafka } from './config/kafka';
 import { UrlController } from './controllers/url.controller';
-import { validateShortenServiceEnv } from '@shorty/shared';
+import { env } from './config/env';
 
 dotenv.config();
 
-validateShortenServiceEnv(process.env);
-
 const app = express();
-const port = process.env.PORT || 3000;
+const port = env.PORT || 3000;
 
 app.use(express.json());
 

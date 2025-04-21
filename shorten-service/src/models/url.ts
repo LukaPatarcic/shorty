@@ -29,7 +29,3 @@ export function normalizeURL(url: string): string {
     throw new Error('Invalid URL provided');
   }
 } 
-
-export function generateCode(): string {
-  return Math.random().toString(36).substring(2, 12);
-}

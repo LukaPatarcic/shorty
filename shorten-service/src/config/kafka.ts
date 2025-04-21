@@ -1,5 +1,7 @@
 import { Kafka, Partitioners } from 'kafkajs';
 import dotenv from 'dotenv';
+import { env } from './env';
+import { TOPICS } from '@shorty/shared';
 
 dotenv.config();
 
@@ -8,7 +10,7 @@ process.env.KAFKAJS_NO_PARTITIONER_WARNING = '1';
 
 const kafka = new Kafka({
   clientId: 'shorty-service',
-  brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
+  brokers: env.KAFKA_BROKERS || ['localhost:9092'],
   retry: {
     initialRetryTime: 300,
     retries: 10
@@ -21,12 +23,6 @@ const producer = kafka.producer({
 
 const consumer = kafka.consumer({ groupId: 'shorty-service-group' });
 const admin = kafka.admin();
-
-// Topic configuration
-export const TOPICS = {
-  URL_EVENTS: 'url.events',
-  URL_CLICKS: 'url.clicks'
-} as const;
 
 // Initialize Kafka topics
 export async function initializeKafka() {

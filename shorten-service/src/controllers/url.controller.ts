@@ -7,10 +7,7 @@ export class UrlController {
     const { url } = req.body;
     const newUrl = await URLService.createShortURL(url);
 
-    res.status(200).json({
-        status: 'success',
-        url: newUrl
-    });
+    res.status(200).json(newUrl);
   }
 
   static health: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
