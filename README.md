@@ -60,6 +60,7 @@ The project consists of three main microservices:
 3. Set up environment variables:
    Create `.env` files in each service directory by copying .env.template:
 
+   - `root/.env`
    - `shorten-service/.env`
    - `redirect-service/.env`
    - `analytics-service/.env`
