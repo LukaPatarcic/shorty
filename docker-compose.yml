@@ -10,10 +10,12 @@ services:
     volumes:
       - ./shorten-service:/app/shorten-service
       - ./shared:/app/shared
-    environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/shorty
-      - KAFKA_BROKERS=kafka:9092
+    env_file:
+      - ./shorten-service/.env
+    # environment:
+    #   - NODE_ENV=development
+    #   - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/shorty
+    #   - KAFKA_BROKERS=kafka:9092
     depends_on:
       - postgres
       - kafka
@@ -29,10 +31,12 @@ services:
     volumes:
       - ./redirect-service:/app/redirect-service
       - ./shared:/app/shared
-    environment:
-      - NODE_ENV=development
-      - KAFKA_BROKERS=kafka:9092
-      - REDIS_URL=redis://redis:6379
+    env_file:
+      - ./redirect-service/.env
+    # environment:
+    #   - NODE_ENV=development
+    #   - KAFKA_BROKERS=kafka:9092
+    #   - REDIS_URL=redis://redis:6379
     depends_on:
       - postgres
       - kafka
@@ -49,10 +53,12 @@ services:
     volumes:
       - ./analytics-service:/app/analytics-service
       - ./shared:/app/shared
-    environment:
-      - NODE_ENV=development
-      - KAFKA_BROKER=kafka:9092
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    env_file:
+      - ./analytics-service/.env
+    # environment:
+    #   - NODE_ENV=development
+    #   - KAFKA_BROKER=kafka:9092
+    #   - ELASTICSEARCH_URL=http://elasticsearch:9200
     depends_on:
       - kafka
       - elasticsearch

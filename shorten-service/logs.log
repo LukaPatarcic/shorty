@@ -1,0 +1,15 @@
+{"level":"info","message":"Kafka initialized successfully"}
+{"level":"info","message":"Server is running on port 3000"}
+{"existingUrl":{"code":"9nJoKZ6i","created_at":"2025-04-21T11:40:53.381Z","id":15,"normalized_url":"https://docs.stripe.com","original_url":"https://docs.stripe.com","updated_at":"2025-04-21T11:40:53.381Z"},"level":"info","message":"URL already exists"}
+{"level":"info","message":"Short URL created","newUrl":{"code":"9nJoKZ6i","created_at":"2025-04-21T11:40:53.381Z","id":15,"normalized_url":"https://docs.stripe.com","original_url":"https://docs.stripe.com","updated_at":"2025-04-21T11:40:53.381Z"}}
+{"existingUrl":{"code":"9nJoKZ6i","created_at":"2025-04-21T11:40:53.381Z","id":15,"normalized_url":"https://docs.stripe.com","original_url":"https://docs.stripe.com","updated_at":"2025-04-21T11:40:53.381Z"},"level":"info","message":"URL already exists"}
+{"level":"info","message":"Short URL created","newUrl":{"code":"9nJoKZ6i","created_at":"2025-04-21T11:40:53.381Z","id":15,"normalized_url":"https://docs.stripe.com","original_url":"https://docs.stripe.com","updated_at":"2025-04-21T11:40:53.381Z"}}
+{"existingUrl":{"code":"9nJoKZ6i","created_at":"2025-04-21T11:40:53.381Z","id":15,"normalized_url":"https://docs.stripe.com","original_url":"https://docs.stripe.com","updated_at":"2025-04-21T11:40:53.381Z"},"level":"info","message":"URL already exists"}
+{"level":"info","message":"Short URL created","newUrl":{"code":"9nJoKZ6i","created_at":"2025-04-21T11:40:53.381Z","id":15,"normalized_url":"https://docs.stripe.com","original_url":"https://docs.stripe.com","updated_at":"2025-04-21T11:40:53.381Z"}}
+{"level":"info","message":"Kafka initialized successfully"}
+{"level":"info","message":"Server is running on port 3000"}
+{"level":"info","message":"Kafka initialized successfully"}
+{"level":"info","message":"Server is running on port 3000"}
+{"level":"info","message":"Kafka initialized successfully"}
+{"level":"info","message":"Server is running on port 3000"}
+{"level":"info","message":"Short URL created","newUrl":{"code":"6w0GvB-W","created_at":"2025-04-21T14:10:19.923Z","id":16,"normalized_url":"https://www.youtube.com","original_url":"https://www.youtube.com/","updated_at":"2025-04-21T14:10:19.923Z"}}

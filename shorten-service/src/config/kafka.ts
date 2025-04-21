@@ -2,6 +2,7 @@ import { Kafka, Partitioners } from 'kafkajs';
 import dotenv from 'dotenv';
 import { env } from './env';
 import { TOPICS } from '@shorty/shared';
+import logger from './logger';
 
 dotenv.config();
 
@@ -44,9 +45,9 @@ export async function initializeKafka() {
     });
 
     await producer.connect();
-    console.log('Kafka initialized successfully');
+    logger.info('Kafka initialized successfully');
   } catch (error) {
-    console.error('Failed to initialize Kafka:', error);
+    logger.error('Failed to initialize Kafka:', error);
     throw error;
   } finally {
     await admin.disconnect();

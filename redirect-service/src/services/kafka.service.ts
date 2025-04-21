@@ -3,6 +3,7 @@ import { consumer, producer } from '../config/kafka';
 import { setCachedURL } from '../config/redis';
 import { Request } from 'express';
 import { TOPICS } from '@shorty/shared';
+import logger from '../config/logger';
 
 interface URLCreatedEvent {
   type: 'url.created';
@@ -31,9 +32,16 @@ export class KafkaService {
     try {
       const { code, original_url } = event.data;
       await setCachedURL(code, original_url);
-      console.log(`Cached URL for code: ${code}`);
+      logger.info({
+        message: 'Cached URL for code',
+        data: { code, original_url }
+      });
     } catch (error) {
-      console.error('Error handling URL created event:', error);
+      logger.error({
+        message: 'Error handling URL created event',
+        error,
+        stack: error instanceof Error ? error.stack : undefined
+      });
     }
   }
 
@@ -58,9 +66,16 @@ export class KafkaService {
         }]
       });
 
-      console.log(`Emitted click event for: ${data.originalUrl}`);
+      logger.info({
+        message: `Emitted click event for ${data.originalUrl}`,
+        data
+      });
     } catch (error) {
-      console.error('Error emitting click event:', error);
+      logger.error({
+        message: 'Error emitting click event',
+        error,
+        stack: error instanceof Error ? error.stack : undefined
+      });
     }
   }
 
@@ -77,7 +92,7 @@ export class KafkaService {
         fromBeginning: true
       });
 
-      await consumer.run({
+      consumer.run({
         eachMessage: async ({ message }) => {
           try {
             if (!message.value) return;
@@ -88,14 +103,22 @@ export class KafkaService {
               await this.handleURLCreated(event);
             }
           } catch (error) {
-            console.error('Error processing message:', error);
+            logger.error({
+              message: 'Error processing message',
+              error,
+              stack: error instanceof Error ? error.stack : undefined
+            });
           }
         }
       });
 
-      console.log('Kafka services started');
+      logger.info('Kafka services started');
     } catch (error) {
-      console.error('Error starting Kafka services:', error);
+      logger.error({
+        message: 'Error starting Kafka services',
+        error,
+        stack: error instanceof Error ? error.stack : undefined
+      });
       throw error;
     }
   }
@@ -106,9 +129,13 @@ export class KafkaService {
         consumer.disconnect(),
         producer.disconnect()
       ]);
-      console.log('Kafka services stopped');
+      logger.info('Kafka services stopped');
     } catch (error) {
-      console.error('Error stopping Kafka services:', error);
+      logger.error({
+        message: 'Error stopping Kafka services',
+        error,
+        stack: error instanceof Error ? error.stack : undefined
+      });
     }
   }
 } 

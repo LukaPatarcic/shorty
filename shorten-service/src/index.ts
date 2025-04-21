@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { initializeKafka } from './config/kafka';
 import { UrlController } from './controllers/url.controller';
 import { env } from './config/env';
+import logger from './config/logger';
 
 dotenv.config();
 
@@ -22,10 +23,10 @@ async function initialize() {
     
     // Start the server
     app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+      logger.info(`Server is running on port ${port}`);
     });
   } catch (error) {
-    console.error('Failed to initialize:', error);
+    logger.error('Failed to initialize:', error);
     process.exit(1);
   }
 }

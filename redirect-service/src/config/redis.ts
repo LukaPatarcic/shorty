@@ -1,9 +1,11 @@
 import Redis from 'ioredis';
 import dotenv from 'dotenv';
+import logger from './logger';
+import { env } from './env';
 
 dotenv.config();
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+const redis = new Redis(env.REDIS_URL || 'redis://localhost:6379', {
   maxRetriesPerRequest: 3,
   retryStrategy(times) {
     const delay = Math.min(times * 50, 2000);
@@ -19,11 +21,15 @@ const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
 });
 
 redis.on('error', (error) => {
-  console.error('Redis error:', error);
+  logger.error({
+    message: 'Redis error',
+    error,
+    stack: error instanceof Error ? error.stack : undefined
+  });
 });
 
 redis.on('connect', () => {
-  console.log('Connected to Redis');
+  logger.info('Connected to Redis');
 });
 
 export default redis;

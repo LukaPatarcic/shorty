@@ -1,15 +1,15 @@
-import { Kafka, Partitioners } from 'kafkajs';
-import dotenv from 'dotenv';
+import { Kafka } from 'kafkajs';
 import { TOPICS } from '@shorty/shared';
+import logger from './logger';
+import { env } from './env';
 
-dotenv.config();
 
 // Silence the partitioner warning
 process.env.KAFKAJS_NO_PARTITIONER_WARNING = '1';
 
 const kafka = new Kafka({
   clientId: 'analytics-service',
-  brokers: (process.env.KAFKA_BROKER || 'kafka:9092').split(','),
+  brokers: env.KAFKA_BROKERS || ['kafka:9092'],
   retry: {
     initialRetryTime: 300,
     retries: 10
@@ -28,9 +28,13 @@ export async function initializeKafka() {
     await consumer.connect();
     await consumer.subscribe({ topics: [TOPICS.URL_EVENTS], fromBeginning: true });
 
-    console.log('Kafka initialized successfully');
+    logger.info('Kafka initialized successfully');
   } catch (error) {
-    console.error('Failed to initialize Kafka:', error);
+    logger.error({
+      message: 'Failed to initialize Kafka',
+      error,
+      stack: error instanceof Error ? error.stack : undefined
+    });
     throw error;
   } finally {
     await admin.disconnect();

@@ -1,6 +1,8 @@
 import { Kafka, Partitioners } from 'kafkajs';
 import dotenv from 'dotenv';
 import { TOPICS } from '@shorty/shared';
+import logger from './logger';
+import { env } from './env';
 
 dotenv.config();
 
@@ -9,7 +11,7 @@ process.env.KAFKAJS_NO_PARTITIONER_WARNING = '1';
 
 const kafka = new Kafka({
   clientId: 'shorty-service',
-  brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
+  brokers: env.KAFKA_BROKERS || ['localhost:9092'],
   retry: {
     initialRetryTime: 300,
     retries: 10
@@ -43,9 +45,13 @@ export async function initializeKafka() {
     });
 
     await producer.connect();
-    console.log('Kafka initialized successfully');
+    logger.info('Kafka initialized successfully');
   } catch (error) {
-    console.error('Failed to initialize Kafka:', error);
+    logger.error({
+      message: 'Failed to initialize Kafka',
+      error,
+      stack: error instanceof Error ? error.stack : undefined
+    });
     throw error;
   } finally {
     await admin.disconnect();

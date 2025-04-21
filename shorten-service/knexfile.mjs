@@ -1,10 +1,11 @@
 import dotenv from 'dotenv';
+import { env } from './src/config/env';
 
 dotenv.config();
 
 const config = {
   client: 'pg',
-  connection: process.env.DATABASE_URL,
+  connection: env.DATABASE_URL,
   pool: {
     min: 2,
     max: 10

@@ -1,8 +1,10 @@
 import { Client } from "@elastic/elasticsearch";
+import { env } from "./env";
+import logger from "./logger";
 
 // Elasticsearch client setup
 const esClient = new Client({
-  node: process.env.ELASTICSEARCH_URL || 'http://localhost:9200'
+  node: env.ELASTICSEARCH_URL || 'http://localhost:9200'
 });
 
 export const esIndices = {
@@ -13,12 +15,6 @@ export const esIndices = {
 // Initialize Elasticsearch indices
 async function setupElasticsearch() {
   try {
-    // esClient.indices.delete({
-    //     index: esIndices.urlClicks
-    // })
-    // esClient.indices.delete({
-    //     index: esIndices.urlMetadata
-    // })
     createIndex(esIndices.urlClicks, {
       properties: {
             code: { type: 'keyword' },
@@ -51,10 +47,14 @@ async function setupElasticsearch() {
             createdAt: { type: 'date' },
         }
     })
-    
-    console.log('Elasticsearch indices created');
+
+    logger.info('Elasticsearch indices created');
   } catch (error) {
-    console.error('Failed to setup Elasticsearch:', error);
+    logger.error({
+        message: 'Failed to setup Elasticsearch',
+        error,
+        stack: error instanceof Error ? error.stack : undefined
+    });
   }
 }
 

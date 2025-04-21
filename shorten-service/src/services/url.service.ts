@@ -3,6 +3,8 @@ import { URLDao } from '../models/url.dao';
 import { producer } from '../config/kafka';
 import { nanoid } from 'nanoid';
 import { TOPICS } from '@shorty/shared';
+import { log } from 'console';
+import logger from '../config/logger';
 
 export class URLService {
   private static readonly CODE_LENGTH = 8;
@@ -13,6 +15,10 @@ export class URLService {
     // Check if URL already exists
     const existingUrl = await URLDao.findByNormalizedURL(normalizedUrl);
     if (existingUrl) {
+      logger.info({
+        message: 'URL already exists',
+        existingUrl
+      });
       return existingUrl;
     }
 
