@@ -32,12 +32,8 @@ redis.on('connect', () => {
   logger.info('Connected to Redis');
 });
 
-export default redis;
-
-// Cache TTL in seconds (7 days)
 export const CACHE_TTL = 7 * 24 * 60 * 60;
 
-// Helper functions for URL caching
 export async function getCachedURL(code: string): Promise<string | null> {
   return redis.get(`url:${code}`);
 }
@@ -48,4 +44,7 @@ export async function setCachedURL(code: string, url: string): Promise<void> {
 
 export async function deleteCachedURL(code: string): Promise<void> {
   await redis.del(`url:${code}`);
-} 
+}
+
+
+export default redis;

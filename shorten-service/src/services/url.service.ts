@@ -40,7 +40,12 @@ export class URLService {
   private static async emitURLCreated(url: URL): Promise<void> {
     const event = {
       type: 'url.created',
-      data: url,
+      data: {
+        originalUrl: url.original_url,
+        code: url.code,
+        createdAt: url.created_at,
+        updatedAt: url.updated_at
+      },
       timestamp: new Date().toISOString()
     };
 

@@ -11,19 +11,13 @@ dotenv.config();
 const app = express();
 const port = env.PORT || 3001;
 
-// Health check endpoint
 app.get('/redirect/health', RedirectController.health);
-
-// Redirect endpoint
 app.get('/redirect/:code', RedirectController.redirect);
 
-// Initialize Kafka consumer and start server
 async function initialize() {
   try {
-    // Start Kafka services
     await KafkaService.startServices();
     
-    // Start the server
     app.listen(port, () => {
       logger.info(`Redirect service is running on port ${port}`);
     });
@@ -37,7 +31,6 @@ async function initialize() {
   }
 }
 
-// Handle graceful shutdown
 process.on('SIGTERM', async () => {
   logger.info('SIGTERM signal received. Shutting down...');
   await KafkaService.stopServices();

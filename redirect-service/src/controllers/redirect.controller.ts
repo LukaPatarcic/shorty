@@ -19,11 +19,14 @@ export class RedirectController {
         return;
       }
 
-      // Emit click event before redirecting
       await KafkaService.emitClickEvent({ originalUrl, code }, req);
 
-      // Send a 301 permanent redirect
-      res.redirect(301, originalUrl);
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+
+      // Use 302 (temporary redirect) instead of 301 to prevent browser caching
+      res.redirect(302, originalUrl);
     } catch (error) {
       console.error('Error redirecting:', error);
       res.status(500).json({ error: 'Internal server error' });
@@ -32,7 +35,6 @@ export class RedirectController {
 
   static health: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Get stats from Redis
       const stats = await getCachedURL('health-check');
       res.json({
         status: 'healthy',

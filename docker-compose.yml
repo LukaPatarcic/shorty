@@ -15,6 +15,20 @@ services:
     networks:
       - default
       - datadog-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000/shorten/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     depends_on:
       postgres:
         condition: service_started
@@ -39,6 +53,20 @@ services:
     networks:
       - default
       - datadog-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3001/redirect/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     depends_on:
       kafka:
         condition: service_healthy
@@ -63,10 +91,46 @@ services:
     networks:
       - default
       - datadog-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3002/analytics/health",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     depends_on:
       kafka:
         condition: service_healthy
       elasticsearch:
+        condition: service_healthy
+
+  shorty-www:
+    build:
+      context: .
+      dockerfile: ./infra/docker/Dockerfile
+      args:
+        SERVICE_NAME: shorty-www
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./shorty-www:/app/shorty-www
+      - ./shared:/app/shared
+    networks:
+      - default
+      - datadog-network
+    depends_on:
+      shorten-service:
+        condition: service_healthy
+      redirect-service:
+        condition: service_healthy
+      analytics-service:
         condition: service_healthy
 
   redis:

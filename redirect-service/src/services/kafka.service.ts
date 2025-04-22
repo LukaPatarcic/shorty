@@ -9,7 +9,7 @@ interface URLCreatedEvent {
   type: 'url.created';
   data: {
     code: string;
-    original_url: string;
+    originalUrl: string;
   };
   timestamp: string;
 }
@@ -30,11 +30,11 @@ export class KafkaService {
 
   private static async handleURLCreated(event: URLCreatedEvent) {
     try {
-      const { code, original_url } = event.data;
-      await setCachedURL(code, original_url);
+      const { code, originalUrl } = event.data;
+      await setCachedURL(code, originalUrl);
       logger.info({
         message: 'Cached URL for code',
-        data: { code, original_url }
+        data: event
       });
     } catch (error) {
       logger.error({
@@ -47,16 +47,18 @@ export class KafkaService {
 
   static async emitClickEvent(data: { originalUrl: string, code: string }, req: Request) {
     try {
-      const event: URLClickEvent = {
-        type: 'url.clicked',
-        data: {
+      const payload = {
           originalUrl: data.originalUrl,
           code: data.code,
           timestamp: new Date().toISOString(),
           userAgent: req.headers['user-agent']?.toString(),
           ipAddress: req.ip,
           referer: req.headers['referer']?.toString()
-        }
+      };
+
+      const event: URLClickEvent = {
+        type: 'url.clicked',
+        data: payload
       };
 
       await producer.send({
@@ -68,7 +70,7 @@ export class KafkaService {
 
       logger.info({
         message: `Emitted click event for ${data.originalUrl}`,
-        data
+        data: payload
       });
     } catch (error) {
       logger.error({
@@ -138,4 +140,4 @@ export class KafkaService {
       });
     }
   }
-} 
+}

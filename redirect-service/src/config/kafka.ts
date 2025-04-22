@@ -6,7 +6,6 @@ import { env } from './env';
 
 dotenv.config();
 
-// Silence the partitioner warning
 process.env.KAFKAJS_NO_PARTITIONER_WARNING = '1';
 
 const kafka = new Kafka({
@@ -25,12 +24,10 @@ const producer = kafka.producer({
 const consumer = kafka.consumer({ groupId: 'shorty-service-group' });
 const admin = kafka.admin();
 
-// Initialize Kafka topics
 export async function initializeKafka() {
   try {
     await admin.connect();
     
-    // Create topics if they don't exist
     await admin.createTopics({
       topics: [{
         topic: TOPICS.URL_EVENTS,

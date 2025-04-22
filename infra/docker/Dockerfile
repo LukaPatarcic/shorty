@@ -13,7 +13,7 @@ COPY shared/package.json ./shared/
 COPY shorten-service/package.json ./shorten-service/
 COPY redirect-service/package.json ./redirect-service/
 COPY analytics-service/package.json ./analytics-service/
-
+COPY shorty-www/package.json ./shorty-www/
 # Copy shared package source
 COPY shared ./shared
 
@@ -28,6 +28,7 @@ RUN pnpm install
 COPY shorten-service ./shorten-service
 COPY redirect-service ./redirect-service
 COPY analytics-service ./analytics-service
+COPY shorty-www ./shorty-www
 
 # Build stage
 FROM base AS build

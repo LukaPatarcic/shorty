@@ -3,3 +3,4 @@ packages:
   - 'redirect-service'
   - 'analytics-service'
   - 'shared' 
+  - 'shorty-www'

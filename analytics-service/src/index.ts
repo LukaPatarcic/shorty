@@ -18,35 +18,41 @@ async function setupKafkaConsumer() {
     eachMessage: async ({ message }) => {
       if (!message.value) return;
       
-      const data = JSON.parse(message.value.toString());
-
-      const { originalUrl, code, timestamp, userAgent, ipAddress, referer } = data.data;
-
       try {
-        await esClient.index({
-          index: esIndices.urlClicks,
-          document: {
-            originalUrl,
-            code,
-            timestamp: new Date(timestamp),
-            userAgent: userAgent || 'unknown',
-            ipAddress: ipAddress || '0.0.0.0',
-            referer: referer || 'unknown'
-          }
-        });
+        const data = JSON.parse(message.value.toString());
+        const { originalUrl, code, timestamp, userAgent, ipAddress, referer } = data.data;
 
-        await esClient.index({
-          index: esIndices.urlMetadata,
-          document: {
-            originalUrl: originalUrl,
-            code: code,
-            createdAt: new Date(),
-          }
-        });
-
+        switch(data.type) {
+          case 'url.clicked':
+            await esClient.index({
+              index: esIndices.urlClicks,
+              document: {
+                originalUrl,
+                code,
+                timestamp: new Date(timestamp),
+                userAgent: userAgent || 'unknown',
+                ipAddress: ipAddress || '0.0.0.0',
+                referer: referer || 'unknown'
+              }
+            });
+            break;
+          case 'url.created':
+            await esClient.index({
+              index: esIndices.urlMetadata,
+              document: {
+                originalUrl: originalUrl,
+                code: code,
+                createdAt: new Date(),
+              }
+            });
+            break;
+          default:
+            return;
+        }
+        
         logger.info({
           message: `Processed click event for: ${data.data.code}`,
-          data: data.data
+          data: data
         });
       } catch (error) {
         logger.error({
